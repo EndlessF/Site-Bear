@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bearsharp — Automação inteligente para Tibia</title>
+  <meta name="description" content="Bearsharp — site institucional estilo roxo/neon. Seções: Início, Funcionalidades, Planos, Contato." />
+  <style>
+    :root{
+      --bg: #0b0b12;
+      --panel: #131324;
+      --muted: #9aa0b3;
+      --text: #e9e9ff;
+      --primary: #8b5cf6; /* roxo */
+      --primary-2: #22d3ee; /* ciano neon */
+      --accent: #a855f7;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --radius: 16px;
+      --shadow: 0 15px 45px rgba(0,0,0,.35);
+      --ring: 0 0 0 2px rgba(139,92,246,.25), 0 0 35px rgba(139,92,246,.35);
+    }
+
+    /* RESET */
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    ul{margin:0;padding:0;list-style:none}
+
+    /* BACKGROUND FX */
+    .bg-grid:before, .bg-grid:after{
+      content:"";position:fixed;inset:-20%;z-index:-2;
+      background:
+        radial-gradient(60vw 60vw at 80% -10%, rgba(34,211,238,.20), transparent 50%),
+        radial-gradient(60vw 60vw at -10% 20%, rgba(139,92,246,.20), transparent 50%),
+        radial-gradient(30vw 30vw at 110% 80%, rgba(168,85,247,.18), transparent 60%);
+      filter:saturate(120%);
+    }
+    .noise{position:fixed;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.5"/></svg>');background-size:300px}
+
+    /* CONTAINER */
+    .container{width:min(1120px, 92vw);margin-inline:auto}
+
+    /* HEADER */
+    header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(11,11,18,.9), rgba(11,11,18,.6));backdrop-filter: blur(8px);border-bottom:1px solid rgba(139,92,246,.18)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+    .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--primary-2));box-shadow:var(--ring)}
+    .brand span{font-size:1.05rem}
+
+    .menu{display:flex;gap:18px;align-items:center}
+    .menu a{padding:10px 12px;border-radius:10px;/* color:var(--muted)*/}
+    .menu a:hover{color:var(--text);background:rgba(139,92,246,.10)}
+    .cta{padding:10px 14px;border-radius:12px;background:linear-gradient(135deg, var(--primary), var(--primary-2));box-shadow:var(--ring);font-weight:600;}
+    .button-text{font-style: var(--success); }
+
+    /* MOBILE NAV */
+    .hamb{display:none;border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:8px}
+    .hamb svg{display:block}
+    @media (max-width: 860px){
+      .menu{display:none}
+      .hamb{display:block}
+      .mobile{position:fixed;inset:56px 0 auto 0;background:rgba(11,11,18,.96);backdrop-filter:blur(8px);border-top:1px solid rgba(139,92,246,.2);padding:14px 20px;display:none}
+      .mobile a{display:block;padding:12px 10px;border-radius:10px;color:var(--muted)}
+      .mobile a:hover{background:rgba(139,92,246,.10);color:var(--text)}
+      .mobile.open{display:block}
+    }
+
+    /* HERO */
+    .hero{padding:96px 0 80px;position:relative}
+    .hero .container{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:center}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.08);color:#d9d4ff;font-size:.85rem}
+    .pill svg{width:16px;height:16px}
+    .hero h1{font-size:clamp(2.1rem, 5vw, 3.2rem);line-height:1.05;margin:14px 0 10px}
+    .gradient-text{background:linear-gradient(90deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{color:var(--muted);max-width:50ch}
+    .actions{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:12px;border:1px solid rgba(139,92,246,.28);background:rgba(19,19,36,.55);color:#f6f3ff;font-weight:600}
+    .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));border-color:transparent;box-shadow:var(--ring)}
+
+    .hero-card{background:linear-gradient(180deg,#151531,#101022);border:1px solid rgba(139,92,246,.25);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .hero-card:before{content:"";position:absolute;inset:-40% -40% auto auto;aspect-ratio:1/1;border-radius:50%;background:radial-gradient(closest-side, rgba(34,211,238,.35), transparent);filter:blur(6px)}
+    .code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:.9rem;background:#0d0d1a;border:1px solid rgba(139,92,246,.25);padding:14px;border-radius:12px;overflow:auto}
+
+    @media (max-width: 860px){
+      .hero .container{grid-template-columns:1fr}
+    }
+
+    /* FEATURES */
+    section{padding:80px 0}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:26px}
+    .section-head h2{font-size:clamp(1.6rem,3.2vw,2.2rem);margin:0}
+    .muted{color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{background:linear-gradient(180deg,#14142a,#0f0f21);border:1px solid rgba(139,92,246,.20);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .card:hover{box-shadow:0 0 0 1px rgba(139,92,246,.35), 0 18px 55px rgba(139,92,246,.15)}
+    .icon{width:36px;height:36px;border-radius:10px;display:inline-grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--primary-2));box-shadow:var(--ring);margin-bottom:10px}
+    .card h3{margin:6px 0 8px;font-size:1.05rem}
+
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 640px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    /* PRICING */
+    .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .plan{background:linear-gradient(180deg,#14142a,#101022);border:1px solid rgba(139,92,246,.22);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden}
+    .plan.popular{border-color:transparent;box-shadow:0 0 0 1px rgba(168,85,247,.35), 0 30px 80px rgba(168,85,247,.25)}
+    .badge{position:absolute;top:14px;right:14px;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,var(--primary),var(--primary-2));font-size:.75rem;font-weight:700}
+    .price{display:flex;align-items:baseline;gap:6px;margin:8px 0 12px}
+    .price .big{font-size:2rem;font-weight:800}
+    .features li{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px dashed rgba(139,92,246,.2)}
+    .features li:first-child{border-top:0}
+    .features svg{min-width:18px;margin-top:2px}
+
+    @media (max-width: 900px){
+      .pricing{grid-template-columns:1fr}
+    }
+
+    /* CONTACT / FOOTER */
+    .contact{display:grid;grid-template-columns:1.1fr 1fr;gap:22px}
+    .contact .panel{background:linear-gradient(180deg,#14142a,#0f0f21);border:1px solid rgba(139,92,246,.20);border-radius:var(--radius);padding:18px}
+    .contact label{display:block;font-size:.9rem;margin:8px 0 6px;color:#cfc8ff}
+    .contact input,.contact textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(139,92,246,.25);background:#0d0d1a;color:var(--text)}
+    .contact textarea{min-height:120px;resize:vertical}
+
+    @media (max-width: 860px){
+      .contact{grid-template-columns:1fr}
+    }
+
+    footer{padding:40px 0;color:var(--muted);border-top:1px solid rgba(139,92,246,.2)}
+
+    /* UTIL */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+  
+</head>
+<body class="bg-grid">
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#inicio" aria-label="Bearsharp — ir ao início">
+        
+       <!-- class="logo" aria-hidden="true"-->
+        <span>
+            <img src="C:\Users\DESKTOP\Desktop\Site - Bear\img\Bear.png" alt="Bear">
+        </span>
+        <span>Bearsharp</span>
+      </a>
+      <nav class="menu" aria-label="Menu principal">
+        <a href="#inicio">Início</a>
+        <a href="#funcionalidades">Funcionalidades</a>
+        <a href="#planos">Planos</a>
+        <a href="#contato">Contato</a>
+    <a href="#planos" class="cta">Começar agora</a>
+      </nav>
+      <button class="hamb" aria-label="Abrir menu" id="hamb" aria-haspopup="true" aria-controls="mobileMenu" aria-expanded="false">
+        
+       <!--  <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h16M3 11h16M3 16h16" stroke="#c7b8ff" stroke-width="1.8" stroke-linecap="round"/></svg>-->
+      </button>
+    </div>
+    <div id="mobileMenu" class="mobile" role="menu" aria-label="Menu mobile">
+      <!--  
+      <div class="container">
+        <a href="#inicio" role="menuitem">Início</a>
+        <a href="#funcionalidades" role="menuitem">Funcionalidades</a>
+        <a href="#planos" role="menuitem">Planos</a>
+        <a href="#contato" role="menuitem">Contato</a>
+        <a href="#planos" role="menuitem" class="cta" style="display:inline-block;margin-top:8px;">Começar agora</a>
+      </div>
+      -->
+    </div>
+    
+  </header>
+
+  <!-- HERO -->
+  <section id="inicio" class="hero">
+    <div class="container">
+      <div>
+        <span class="pill">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.39 4.84L20 9.27l-4 3.89.94 5.49L12 16.9l-4.94 2.75L8 13.16l-4-3.89 5.61-1.43L12 3z"/></svg>
+          Lançamento • Tecnologia Neon
+        </span>
+        <h1>Automação inteligente para jogadores <span class="gradient-text">Bearsharp</span></h1>
+        <p class="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu urna non ipsum bibendum efficitur. Integer dictum, lorem a luctus aliquet, nibh arcu gravida nibh, sed porta lectus nulla et nisl.</p>
+        <div class="actions">
+          <a href="#planos" class="btn primary">Ver planos</a>
+          <a href="#funcionalidades" class="btn">Explorar recursos</a>
+        </div>
+      </div>
+
+      <div class="hero-card" aria-label="Exemplo ilustrativo">
+        <div class="code" aria-hidden="true"><pre><code>
+            <img src="C:\Users\DESKTOP\Desktop\Site - Bear\img\tibia-cyf9e.jpg" alt="banner tibia">
+        </code></pre></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="funcionalidades">
+    <div class="container">
+      <div class="section-head">
+        <h2>Funcionalidades</h2>
+        <p class="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis.</p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 4.84L19.53 19H4.47L12 6.84zM11 10h2v5h-2v-5zm0 6h2v2h-2v-2z"/></svg>
+          </div>
+          <h3>Segurança avançada</h3>
+          <p class="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nec mi id libero pretium.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v2H3V3zm2 4h14v14H5V7zm4 3h6v2H9v-2zm0 4h6v2H9v-2z"/></svg>
+          </div>
+          <h3>Scripts flexíveis</h3>
+          <p class="muted">Curabitur iaculis, lorem quis maximus pharetra, metus massa posuere arcu, nec feugiat justo lorem non arcu.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4a8 8 0 100 16 8 8 0 000-16zm1 5v3.59l2.3 2.3-1.41 1.41L11 13V9h2z"/></svg>
+          </div>
+          <h3>Performance em tempo real</h3>
+          <p class="muted">Vivamus sed nisl vel quam facilisis gravida. Suspendisse potenti. Donec placerat bibendum arcu.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4h10v2H7V4zm-2 4h14v2H5V8zm2 4h10v2H7v-2zm-2 4h14v2H5v-2z"/></svg>
+          </div>
+          <h3>Interface intuitiva</h3>
+          <p class="muted">Integer pharetra urna at semper dignissim. Vestibulum eget felis vitae lorem faucibus gravida.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm9 5a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3>Atualizações constantes</h3>
+          <p class="muted">Mauris vehicula, augue ac iaculis varius, mauris erat luctus velit, id posuere lorem lorem ac dui.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+          </div>
+          <h3>Compatível e modular</h3>
+          <p class="muted">Nunc vulputate, justo id consequat porttitor, urna urna fermentum arcu, vitae blandit mauris nunc et justo.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="planos">
+    <div class="container">
+      <div class="section-head">
+        <h2>Planos</h2>
+      </div>
+
+      <div class="pricing">
+        <div class="plan" aria-label="Plano Básico">
+          <h3>Básico</h3>
+          <div class="price"><span class="big">R$ 100</span><span class="muted">/mês</span></div>
+          <ul class="features">
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 20.3 7.7l-1.4-1.4z"/></svg>
+              Lorem ipsum dolor sit amet
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 20.3 7.7l-1.4-1.4z"/></svg>
+              Consectetur adipiscing elit
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 20.3 7.7l-1.4-1.4z"/></svg>
+              Suporte básico
+            </li>
+          </ul>
+          <a class="btn primary" href="#contato">Começar</a>
+        </div>
+
+        <div class="plan popular" aria-label="Plano Pro">
+          <span class="badge">Popular</span>
+          <h3>Pro</h3>
+          <div class="price"><span class="big">R$ 39</span><span class="muted">/mês</span></div>
+          <ul class="features">
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 20.3 7.7l-1.4-1.4z"/></svg>
+              Tudo do Básico + extras
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 20.3 7.7l-1.4-1.4z"/></svg>
+              Recursos premium
+            </li>
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 20.3 7.7l-1.4-1.4z"/></svg>
+              Suporte prioritário
+            </li>
+          </ul>
+          <a class="btn primary" href="#contato">Assinar Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+ <!--
+  <section id="contato">
+    <div class="container">
+      <div class="section-head">
+        <h2>Contato</h2>
+        <p class="muted">Tem dúvidas? Envie uma mensagem. Lorem ipsum dolor sit amet.</p>
+      </div>
+
+      <div class="contact">
+        <form class="panel" onsubmit="event.preventDefault(); alert('Mensagem enviada! (exemplo)'); this.reset();">
+          <label for="nome">Nome</label>
+          <input id="nome" name="nome" placeholder="Seu nome" required />
+          <label for="email">E-mail</label>
+          <input id="email" type="email" name="email" placeholder="voce@exemplo.com" required />
+          <label for="mensagem">Mensagem</label>
+          <textarea id="mensagem" name="mensagem" placeholder="Como podemos ajudar?"></textarea>
+          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn primary" type="submit">Enviar</button>
+            <a class="btn" href="#inicio">Voltar ao topo</a>
+          </div>
+        </form>
+        <aside class="panel">
+          <h3>Informações</h3>
+          <p class="muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ac nisi vitae libero rhoncus tristique.</p>
+          <ul style="margin-top:10px">
+            <li>📍 Endereço: Lorem street, 123</li>
+            <li>✉️ E-mail: contato@bearsharp.dev</li>
+            <li>🕘 Atendimento: 09h - 18h</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+  -->
+
+  <footer>
+    <div class="container" style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="logo" aria-hidden="true"></span>
+        <span class="muted">© <span id="year"></span> Bearsharp. Todos os direitos reservados.</span>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <a class="muted" href="#">Termos</a>
+        <span style="opacity:.3">•</span>
+        <a class="muted" href="#">Privacidade</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Ano dinâmico
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Menu mobile
+    const hamb = document.getElementById('hamb');
+    const mobile = document.getElementById('mobileMenu');
+    hamb?.addEventListener('click', () => {
+      const open = mobile.classList.toggle('open');
+      hamb.setAttribute('aria-expanded', String(open));
+    });
+
+    // Fecha menu ao clicar em link
+    document.querySelectorAll('#mobileMenu a').forEach(a => a.addEventListener('click', ()=> mobile.classList.remove('open')));
+  </script>
+</body>
+</html>
